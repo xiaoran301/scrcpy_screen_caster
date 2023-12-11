@@ -9,6 +9,18 @@ import java.util.List;
 
 public final class Server {
 
+    static {
+        Ln.disableSystemStreams();
+        Ln.initLogLevel(Ln.Level.VERBOSE);
+
+        Ln.d("try load library scrcpy begin");
+//        System.loadLibrary("scrcpy");
+        System.load("/data/local/tmp/libscrcpy.so");
+//        System.load("/data/local/tmp/scrcpy-server.jar/lib/arm64-v8a/libscrcpy.so");
+
+        Ln.d("try load library scrcpy end !!!!!!!!!!!!!!!!");
+    }
+
     private static class Completion {
         private int running;
         private boolean fatalError;
@@ -87,6 +99,7 @@ public final class Server {
     }
 
     private static void scrcpy(Options options) throws IOException, ConfigurationException {
+        Ln.d("scrcpy constructor ~~~~~~~~~~~~");
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S && options.getVideoSource() == VideoSource.CAMERA) {
             Ln.e("Camera mirroring is not supported before Android 12");
             throw new ConfigurationException("Camera mirroring is not supported");
@@ -204,10 +217,9 @@ public final class Server {
             Ln.e("Exception on thread " + t, e);
         });
 
+        Ln.d("internalMain~~~~~~~~~");
         Options options = Options.parse(args);
 
-        Ln.disableSystemStreams();
-        Ln.initLogLevel(options.getLogLevel());
 
         Ln.i("Device: [" + Build.MANUFACTURER + "] " + Build.BRAND + " " + Build.MODEL + " (Android " + Build.VERSION.RELEASE + ")");
 

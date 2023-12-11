@@ -61,6 +61,10 @@ sc_adb_push(struct sc_intr *intr, const char *serial, const char *local,
             const char *remote, unsigned flags);
 
 bool
+sc_adb_unzip(struct sc_intr *intr, const char *serial, const char *local,
+            const char *remote, unsigned flags);
+
+bool
 sc_adb_install(struct sc_intr *intr, const char *serial, const char *local,
                unsigned flags);
 

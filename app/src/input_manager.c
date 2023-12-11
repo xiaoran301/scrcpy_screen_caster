@@ -575,7 +575,12 @@ sc_input_manager_process_mouse_motion(struct sc_input_manager *im,
             sc_mouse_buttons_state_from_sdl(event->state,
                                             im->forward_all_clicks),
     };
-
+    
+    // hmd rotate
+    if(im->mp->mRotateHMDMode){
+        LOGD("rx: %d, ry: %d",evt.xrel,evt.yrel);
+    }
+    
     assert(im->mp->ops->process_mouse_motion);
     im->mp->ops->process_mouse_motion(im->mp, &evt);
 
@@ -590,6 +595,7 @@ sc_input_manager_process_mouse_motion(struct sc_input_manager *im,
         struct sc_point vfinger = inverse_point(mouse, im->screen->frame_size);
         simulate_virtual_finger(im, AMOTION_EVENT_ACTION_MOVE, vfinger);
     }
+
 }
 
 static void
@@ -649,10 +655,11 @@ sc_input_manager_process_mouse_button(struct sc_input_manager *im,
                 }
                 return;
             }
-            if (event->button == SDL_BUTTON_RIGHT) {
-                press_back_or_turn_screen_on(controller, action);
-                return;
-            }
+            // temp comment by xhj
+//            if (event->button == SDL_BUTTON_RIGHT) {
+//                press_back_or_turn_screen_on(controller, action);
+//                return;
+//            }
             if (event->button == SDL_BUTTON_MIDDLE) {
                 action_home(controller, action);
                 return;
@@ -732,6 +739,11 @@ sc_input_manager_process_mouse_button(struct sc_input_manager *im,
             return;
         }
         im->vfinger_down = down;
+    }
+    // hmd rotate mode process
+    if(event->button == SDL_BUTTON_RIGHT &&
+            (down != im->mp->mRotateHMDMode)){
+        im->mp->mRotateHMDMode = down;
     }
 }
 

@@ -75,6 +75,13 @@ sc_mouse_processor_process_mouse_motion(struct sc_mouse_processor *mp,
             .buttons = convert_mouse_buttons(event->buttons_state),
         },
     };
+    
+    // 处理按住鼠标右键移动旋转hmd
+    if(mp->mRotateHMDMode){
+        msg.inject_touch_event.pressure = 2.f; // 2.f表示分发到pico inject，不再进入android系统
+        msg.inject_touch_event.position.point.x = event->xrel; // 用delta x,y代替
+        msg.inject_touch_event.position.point.y = event->yrel;
+    }
 
     if (!sc_controller_push_msg(mi->controller, &msg)) {
         LOGW("Could not request 'inject mouse motion event'");

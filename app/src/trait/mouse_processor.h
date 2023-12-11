@@ -23,6 +23,7 @@ struct sc_mouse_processor {
      * pointer must be "captured" by the UI.
      */
     bool relative_mode;
+    bool mRotateHMDMode; // hmd rotate mode
 };
 
 struct sc_mouse_processor_ops {

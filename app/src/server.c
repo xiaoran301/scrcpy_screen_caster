@@ -127,8 +127,14 @@ push_server(struct sc_intr *intr, const char *serial) {
         free(server_path);
         return false;
     }
+    LOGI("adb push begin");
     bool ok = sc_adb_push(intr, serial, server_path, SC_DEVICE_SERVER_PATH, 0);
+    LOGI("adb push finished,ok:%d",ok);
+    
+    ok = sc_adb_unzip(intr,serial,server_path, SC_DEVICE_SERVER_PATH, 0);
+    LOGI("adb unzip finished,ok:%d",ok);
     free(server_path);
+    
     return ok;
 }
 

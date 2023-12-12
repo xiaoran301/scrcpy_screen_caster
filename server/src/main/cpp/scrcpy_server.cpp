@@ -20,6 +20,7 @@
 #include "tracking_pose.h"
 #include "log_util.h"
 #include "quater.h"
+#include "custom_math.h"
 
 // tracking client 接口
 #define TRACKINGCLIENT_NAME "libtrackingclient.pxr.so"
@@ -37,6 +38,13 @@ void *g_pTrackingclient = nullptr;
 
 // 用于头戴的位姿
 algo_result_t g_fakepose;
+
+// 是否开启pico的inject
+bool g_openHook = false;
+
+// 当前旋转比例
+Vector3 g_rotate_ratio = {0, 0, 0};
+
 
 void reset_trackpose(algo_result_t *trackpose){
     trackpose->pose.x = 0;
@@ -74,12 +82,14 @@ int init_trackingservice_client(){
     reset_trackpose(&g_fakepose);
     return 0;
 }
+
 /**
 * 开启和关闭注入
 * @return bool
 * @note 使用前先开启开关，一旦开启，设备的输入将会失效，因此使用完成后需要关闭
 */
 bool open_hook(bool flag){
+    LOGI("open_hook: %d", flag);
     if(g_pTrackingclient == nullptr){
         int ret = init_trackingservice_client();
         if(ret != 0){
@@ -90,6 +100,12 @@ bool open_hook(bool flag){
     return true;
 }
 
+void switch_open_hook(){
+    open_hook(!g_openHook);
+    g_openHook =!g_openHook;
+}
+
+
 /**
 * rotate hmd
 * @param nwdx normal window delta x
@@ -98,10 +114,17 @@ bool open_hook(bool flag){
 * @note window origin is left up corner,normal range:[-1,1] map to [-90,90] degree
 */
 void rotate_hmd(float nwdx, float nwdy){
-    float nx = nwdx;
+    if(!g_openHook){
+        LOGI("auto open hook,when drag mouse in pressed right state!!");
+        switch_open_hook();
+    }
+    float nx = -nwdx;
     float ny = -nwdy;
-    
-    Quaternion quater =  eulerToQuaternion(0,ny*90,nx*90);
+    LOGI("rotate_hmd nx:%f ny:%f", nx, ny);
+
+    g_rotate_ratio.x += nx;
+    g_rotate_ratio.y += ny;
+    Quaternion quater =  eulerToQuaternion(g_rotate_ratio.y*90,g_rotate_ratio.x*90,0);
     g_fakepose.pose.rw = quater.w;
     g_fakepose.pose.rx = quater.x;
     g_fakepose.pose.ry = quater.y;
@@ -109,8 +132,25 @@ void rotate_hmd(float nwdx, float nwdy){
     g_client_interface.injectHMDPose(g_pTrackingclient, &g_fakepose);
 }
 
-int main(){
-    LOGI("scrcpy_server main entry");
-    init_trackingservice_client();
-    return 0;
-}
+class AutoCleanUp{
+public:
+    AutoCleanUp(){
+        LOGI("AutoCleanUp constructor");
+    }
+    ~AutoCleanUp(){
+        LOGI("AutoCleanUp destructor");
+        if(g_openHook){
+            LOGI("AutoCleanUp will close pico inject");
+
+            // 清理旋转数据
+            g_rotate_ratio.reset();
+            rotate_hmd(0,0);
+
+            // 关闭
+            g_openHook = false;
+            open_hook(false);
+
+        }
+    }
+};
+static AutoCleanUp s_automactic_clean_up;

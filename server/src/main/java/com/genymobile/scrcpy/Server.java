@@ -205,6 +205,7 @@ public final class Server {
             Ln.e(t.getMessage(), t);
             status = 1;
         } finally {
+            Ln.d("scrcpy server will exit!");
             // By default, the Java process exits when all non-daemon threads are terminated.
             // The Android SDK might start some non-daemon threads internally, preventing the scrcpy server to exit.
             // So force the process to exit explicitly.

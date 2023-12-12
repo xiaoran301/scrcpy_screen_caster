@@ -29,3 +29,30 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     globalJVM->DetachCurrentThread();
     globalJVM = nullptr;
 }
+
+
+void rotate_hmd(float nwdx, float nwdy);
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_genymobile_scrcpy_Controller_nativeRotateHMD(JNIEnv* env,
+                                                      jobject thiz,
+                                                      jfloat x,
+                                                      jfloat y) {
+    rotate_hmd(x,y);
+}
+
+void switch_open_hook();
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_genymobile_scrcpy_Controller_nativeSwitchOpenHook(JNIEnv* env, jobject thiz) {
+    // TODO: implement nativeSwitchOpenHook()
+    switch_open_hook();
+}
+
+
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_genymobile_scrcpy_CleanUp_nativeOpenHook(JNIEnv* env, jclass clazz, jboolean flag) {
+    open_hook(flag);
+}

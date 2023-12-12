@@ -8,17 +8,17 @@
 * this material is strictly forbidden unless prior written permission is obtained
 * from PICO.
 *
-* Created by xuhengjin on 2023/12/6.
+* Created by xuhengjin on 2023/12/12.
 * Brief:
 *************************************************************/
 
-#ifndef SCRCPY_SCREEN_CASTER_SERVER_SRC_MAIN_CPP_LOG_UTIL_H_
-#define SCRCPY_SCREEN_CASTER_SERVER_SRC_MAIN_CPP_LOG_UTIL_H_
-#include <android/log.h>
-#define LOG_TAG "scrcpy_server_native"
+#ifndef SCRCPY_SCREEN_CASTER_SERVER_SRC_MAIN_CPP_CUSTOM_MATH_H_
+#define SCRCPY_SCREEN_CASTER_SERVER_SRC_MAIN_CPP_CUSTOM_MATH_H_
 
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
-#endif //SCRCPY_SCREEN_CASTER_SERVER_SRC_MAIN_CPP_LOG_UTIL_H_
+struct Vector3{
+       float x, y, z;
+       void reset(){
+           x = y = z = 0.0f;
+       }
+};
+#endif //SCRCPY_SCREEN_CASTER_SERVER_SRC_MAIN_CPP_CUSTOM_MATH_H_

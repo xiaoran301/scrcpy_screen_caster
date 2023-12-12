@@ -4,6 +4,7 @@ import com.genymobile.scrcpy.wrappers.InputManager;
 
 import android.os.Build;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.InputDevice;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
@@ -40,6 +41,10 @@ public class Controller implements AsyncProcessor {
     private final MotionEvent.PointerCoords[] pointerCoords = new MotionEvent.PointerCoords[PointersState.MAX_POINTERS];
 
     private boolean keepPowerModeOff;
+
+
+    private native void nativeSwitchOpenHook();
+    private native void nativeRotateHMD(float x, float y);
 
     public Controller(Device device, DesktopConnection connection, boolean clipboardAutosync, boolean powerOn) {
         this.device = device;
@@ -124,8 +129,18 @@ public class Controller implements AsyncProcessor {
         ControlMessage msg = connection.receiveControlMessage();
         switch (msg.getType()) {
             case ControlMessage.TYPE_INJECT_KEYCODE:
-                if (device.supportsInputEvents()) {
-                    injectKeycode(msg.getAction(), msg.getKeycode(), msg.getRepeat(), msg.getMetaState());
+//                Ln.d(" action:"+msg.getAction()+"keyCode:"+msg.getKeycode()+"repeat:"+msg.getRepeat()+"state:"+msg.getMetaState());
+                // AKEYCODE_PICO_INJECT=285
+                if(msg.getKeycode() == 285){
+                    if(msg.getAction() == 1){
+                        // 只响应按键的抬起
+                        nativeSwitchOpenHook();
+                    }
+                }
+                else{
+                    if (device.supportsInputEvents()) {
+                        injectKeycode(msg.getAction(), msg.getKeycode(), msg.getRepeat(), msg.getMetaState());
+                    }
                 }
                 break;
             case ControlMessage.TYPE_INJECT_TEXT:
@@ -135,7 +150,17 @@ public class Controller implements AsyncProcessor {
                 break;
             case ControlMessage.TYPE_INJECT_TOUCH_EVENT:
                 if (device.supportsInputEvents()) {
-                    injectTouch(msg.getAction(), msg.getPointerId(), msg.getPosition(), msg.getPressure(), msg.getActionButton(), msg.getButtons());
+                    if(msg.getPressure()> 0.8f && msg.getPressure()< 0.9f){
+//                        Ln.d("injectTouchPressure: " + msg.getPressure());
+                        // 调用jni函数注入
+                        Position pos = msg.getPosition();
+                        Point pt = pos.getPoint();
+                        Size sz= pos.getScreenSize();
+                        nativeRotateHMD((float)pt.getX()*2.f/sz.getWidth(), (float)pt.getY()*2.f/sz.getHeight());
+                    }
+                    else{
+                        injectTouch(msg.getAction(), msg.getPointerId(), msg.getPosition(), msg.getPressure(), msg.getActionButton(), msg.getButtons());
+                    }
                 }
                 break;
             case ControlMessage.TYPE_INJECT_SCROLL_EVENT:

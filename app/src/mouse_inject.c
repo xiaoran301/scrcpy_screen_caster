@@ -78,7 +78,7 @@ sc_mouse_processor_process_mouse_motion(struct sc_mouse_processor *mp,
     
     // 处理按住鼠标右键移动旋转hmd
     if(mp->mRotateHMDMode){
-        msg.inject_touch_event.pressure = 2.f; // 2.f表示分发到pico inject，不再进入android系统
+        msg.inject_touch_event.pressure = 0.88f; // 0.88.f表示分发到pico inject，不再进入android系统
         msg.inject_touch_event.position.point.x = event->xrel; // 用delta x,y代替
         msg.inject_touch_event.position.point.y = event->yrel;
     }

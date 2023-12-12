@@ -123,6 +123,11 @@ action_power(struct sc_controller *controller, enum sc_action action) {
 }
 
 static inline void
+action_open_pico_inject(struct sc_controller *controller, enum sc_action action){
+    send_keycode(controller, AKEYCODE_PICO_INJECT, action, "PICO_INJECT");
+}
+
+static inline void
 action_volume_up(struct sc_controller *controller, enum sc_action action) {
     send_keycode(controller, AKEYCODE_VOLUME_UP, action, "VOLUME_UP");
 }
@@ -410,6 +415,11 @@ sc_input_manager_process_key(struct sc_input_manager *im,
             case SDLK_p:
                 if (controller && !shift && !repeat) {
                     action_power(controller, action);
+                }
+                return;
+            case SDLK_a:
+                if (controller && !shift && !repeat) {
+                    action_open_pico_inject(controller, action);
                 }
                 return;
             case SDLK_o:

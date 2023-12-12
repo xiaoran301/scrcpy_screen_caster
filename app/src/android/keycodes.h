@@ -739,7 +739,8 @@ enum android_keycode {
     /** fingerprint navigation key, right. */
     AKEYCODE_SYSTEM_NAVIGATION_RIGHT = 283,
     /** all apps */
-    AKEYCODE_ALL_APPS = 284
+    AKEYCODE_ALL_APPS = 284,
+    AKEYCODE_PICO_INJECT = 285,
 };
 
 #endif // _ANDROID_KEYCODES_H

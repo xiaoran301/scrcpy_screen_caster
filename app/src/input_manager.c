@@ -588,7 +588,7 @@ sc_input_manager_process_mouse_motion(struct sc_input_manager *im,
     
     // hmd rotate
     if(im->mp->mRotateHMDMode){
-        LOGD("rx: %d, ry: %d",evt.xrel,evt.yrel);
+//        LOGD("rx: %d, ry: %d",evt.xrel,evt.yrel);
     }
     
     assert(im->mp->ops->process_mouse_motion);
